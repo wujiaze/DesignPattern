@@ -10,25 +10,20 @@ public class IntensityState : State
     public override void InitTransitions(StateManager manager)
     {
         intensity2Color = SetTransition(manager, StateName.Color, TransitionName.Intensity2Color);
+        intensity2Color.onCheck += OnCheck;
         AddTransition(intensity2Color);
+        onEnter += OnEnter;
+        onStayUpdate += OnStayUpdate;
     }
 
-    public override Transition SetTransition(StateManager manager, StateName toName, TransitionName transitionName)
-    {
-        StateMachine machine = manager.GetMachineWithName(Machine.Name);
-        State toState = machine.GetStateWithName(toName);
-        if (toState == null)
-            throw new Exception(toName + "为null");
-        Transition temp = new Transition(transitionName, toState);
-        temp.onCheck += OnCheck;
-        return temp;
-    }
+   
 
     private bool IsIntenMax;
     private Light _light;
     private float _speed = 1;
     private int _maxinten = 2;
     private Test _test;
+
     public override void SetObject(object obj)
     {
         _test = (Test) obj;
@@ -42,17 +37,7 @@ public class IntensityState : State
     {
         return _test.IsColor;
     }
-    public override void OnStateEnter()
-    {
-        IsIntenMax = false;
-    }
-
-    public override void OnStateExit()
-    {
-
-    }
-
-    public override void OnStateUpdate(float deltatime)
+    private void OnStayUpdate(float deltatime)
     {
         if (!IsIntenMax)
         {
@@ -80,5 +65,9 @@ public class IntensityState : State
         }
     }
 
+    private void OnEnter()
+    {
+        IsIntenMax = false;
+    }
 
 }

@@ -6,26 +6,22 @@ using FSM;
 
 public class OpenMachine : StateMachine
 {
+    private Test _test;
+    private Light _light;
     private Transition open2close;
+
     public override void InitTransitions(StateManager manager)
     {
         open2close = SetTransition(manager, StateName.Close, TransitionName.Open2Close);
+        open2close.onCheck += OnCheck;
+        open2close.onTransition += OnTransition;
         AddTransition(open2close);
+        onExit += OnExit;
     }
 
-    public override Transition SetTransition(StateManager manager, StateName toName, TransitionName transitionName)
-    {
-        StateMachine machine = manager.GetMachineWithName(Machine.Name);
-        State toState = machine.GetStateWithName(toName);
-        if (toState == null)
-            throw new Exception(toName + "为null");
-        Transition temp = new Transition(transitionName, toState);
-        temp.onCheck += OnCheck;
-        temp.onTransition += () => FadeTo(0);
-        return temp;
-    }
-    private Test _test;
-    private Light _light;
+    
+
+
     public override void SetObject(object obj)
     {
         _test = (Test)obj;
@@ -40,12 +36,11 @@ public class OpenMachine : StateMachine
     {
         return !_test.IsOpen;
     }
-
-    public override void OnStateEnter()
+    private bool OnTransition()
     {
-
+        return FadeTo(0);
     }
-    public override void OnStateExit()
+    private void OnExit()
     {
         _test.IsColor = false;
     }

@@ -11,19 +11,14 @@ public class ColorState : State
     public override void InitTransitions(StateManager manager)
     {
         color2Intensity = SetTransition(manager, StateName.Intensity, TransitionName.Color2Intensity);
+        color2Intensity.onCheck += OnCheck;
         AddTransition(color2Intensity);
+        onEnter += OnEnter;
+        onStayUpdate += OnStayUpdate;
     }
 
-    public override Transition SetTransition(StateManager manager, StateName toName, TransitionName transitionName)
-    {
-        StateMachine machine = manager.GetMachineWithName(Machine.Name);
-        State toState = machine.GetStateWithName(toName);
-        if (toState == null)
-            throw new Exception(toName + "为null");
-        Transition temp = new Transition(transitionName, toState);
-        temp.onCheck += OnCheck;
-        return temp;
-    }
+
+
     private bool IsAnimation;
     private float _colorTimer = 0;
     private Light _light;
@@ -43,25 +38,11 @@ public class ColorState : State
     {
         return !_test.IsColor;
     }
-
-
-    public override void OnStateEnter()
+    private void OnStayUpdate(float deltatime)
     {
-        IsAnimation = false;
-    }
-
-    public override void OnStateExit()
-    {
-
-    }
-
-    public override void OnStateUpdate(float deltatime)
-    {
-        base.OnStateUpdate(deltatime);
-
         if (IsAnimation)
         {
-            _colorTimer += Time.deltaTime * 1;
+            _colorTimer += deltatime * 1;
             if (_colorTimer >= 1)
             {
                 _light.color = _targetColor;
@@ -82,15 +63,8 @@ public class ColorState : State
         }
     }
 
-    public override void OnStateLateUpdate(float detaltime)
+    private void OnEnter()
     {
-        
+        IsAnimation = false;
     }
-
-    public override void OnStateFixedUpdate()
-    {
-        
-    }
-
-
 }
