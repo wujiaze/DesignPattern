@@ -45,21 +45,13 @@ namespace FSM
         protected State()
         {
         }
-        /// <summary>
-        /// 用于状态机的构造
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="machine"></param>
-        protected State(StateName name, StateMachine machine)
-        {
-            InitState(name, machine);
-        }
+
         /// <summary>
         /// 初始化状态
         /// </summary>
         /// <param name="name"></param>
         /// <param name="machine"></param>
-        public virtual void InitState(StateName name, StateMachine machine)
+        public void InitState(StateName name, StateMachine machine)
         {
             Name = name;
             Machine = machine;
