@@ -51,7 +51,7 @@ namespace FSM
         /// </summary>
         /// <param name="name"></param>
         /// <param name="machine"></param>
-        public void InitState(StateName name, StateMachine machine)
+        public virtual void InitState(StateName name, StateMachine machine)
         {
             Name = name;
             Machine = machine;

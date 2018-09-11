@@ -34,15 +34,18 @@ namespace FSM
         /// <summary>
         /// 用于状态机的内部泛型构造
         /// </summary>
-        protected StateMachine() { }
+        protected StateMachine()
+        {
+
+        }
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="name">状态机的名字</param>
         /// <param name="machine">状态机所属的父状态机</param>
-        protected StateMachine(StateName name, StateMachine machine) : base(name, machine)
+        protected StateMachine(StateName name, StateMachine machine)
         {
-
+            this.InitState(name, machine);
         }
         /// <summary>
         /// 初始化状态机
@@ -56,6 +59,7 @@ namespace FSM
             CurrentState = null;
             DictStates = new Dictionary<StateName, State>();
             CurrentTransition = null;
+
         }
 
         /// <summary>

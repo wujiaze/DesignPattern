@@ -36,7 +36,7 @@ namespace FSM
         /// </summary>
         protected StateMachine()
         {
-            InitState();
+
         }
         /// <summary>
         /// 构造函数
@@ -45,18 +45,21 @@ namespace FSM
         /// <param name="machine">状态机所属的父状态机</param>
         protected StateMachine(StateName name, StateMachine machine)
         {
-            InitState(name, machine);
-            InitState();
+            this.InitState(name, machine);
         }
         /// <summary>
         /// 初始化状态机
         /// </summary>
-        public  void InitState()
+        /// <param name="name"></param>
+        /// <param name="machine"></param>
+        public override void InitState(StateName name, StateMachine machine)
         {
+            base.InitState(name, machine);
             DefaultState = null;
             CurrentState = null;
             DictStates = new Dictionary<StateName, State>();
             CurrentTransition = null;
+
         }
 
         /// <summary>
@@ -126,17 +129,20 @@ namespace FSM
         }
 
         /* 以下两个方法在 状态机的子类中可以修改*/
+
         public override void OnStateEnter()
         {
-
+            base.OnStateEnter();
         }
+
         public override void OnStateExit()
         {
-
+            base.OnStateExit();
         }
         /* 以下三个方法 一般不修改*/
         public override void OnStateUpdate(float deltatime)
         {
+            base.OnStateUpdate(deltatime);
             // 是否正在进行状态转换
             bool result = DoTransition();
             // 调用状态的Update方法
@@ -144,17 +150,19 @@ namespace FSM
                 CurrentState.OnStateUpdate(deltatime);
         }
 
-        public override void OnStateLateUpdate(float detaltime)
+        public override void OnStateLateUpdate(float deltatime)
         {
+            base.OnStateLateUpdate(deltatime);
             // 是否正在进行状态转换
             bool result = DoTransition();
             // 调用状态的Update方法
             if (result == false)
-                CurrentState.OnStateLateUpdate(detaltime);
+                CurrentState.OnStateLateUpdate(deltatime);
         }
 
         public override void OnStateFixedUpdate()
         {
+            base.OnStateFixedUpdate();
             // 是否正在进行状态转换
             bool result = DoTransition();
             // 调用状态的Update方法

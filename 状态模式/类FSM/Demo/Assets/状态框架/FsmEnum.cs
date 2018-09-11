@@ -5,6 +5,7 @@
     /// </summary>
     public enum StateName
     {
+        Null,
         MainMachine,
         Close,
         OpenMachine,
@@ -16,6 +17,7 @@
     /// </summary>
     public enum TransitionName
     {
+        Null,
         Close2Open,
         Color2Intensity,
         Intensity2Color,
@@ -26,7 +28,7 @@
     /// </summary>
     public enum StateTag
     {
-        
+        Null
     }
 
    
