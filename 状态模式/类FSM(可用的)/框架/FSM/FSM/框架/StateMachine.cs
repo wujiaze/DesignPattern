@@ -59,7 +59,6 @@ namespace FSM
             CurrentState = null;
             DictStates = new Dictionary<StateName, State>();
             CurrentTransition = null;
-
         }
 
         /// <summary>
