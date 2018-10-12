@@ -1,17 +1,18 @@
 ﻿/*
  *      本框架的使用方法
  *               1、添加具体状态类 继承 State
+ *                  在 InitTransitions 中使用 AddTransition 方法添加需要的状态过渡，并且设置好状态过渡的检测条件
+ *                  在 SetObject 中设置好状态中需要使用到的引用
  *               2、添加具体状态机类 继承 StateMachine
- *               3、SetDefauleStateAndTrasition 只能在状态机添加了所有的状态之后调用
- *               4、需要 new一个MachineManager 用来集合某一个父状态机相关联的所有状态机
+ *                  在 InitTransitions 中使用 AddTransition 方法添加需要的状态过渡，并且设置好状态过渡的检测条件
+ *                  在 SetObject 中设置好状态中需要使用到的引用
+ *               3、需要一个 MachineManager 的对象收集 某一个父状态机相关联的所有状态机及状态
  *               
  *               
- *      注意事项：1、一个 MachineManager 中的同一父状态机下的状态名字不能相同
- *               2、AddState 方法既可以添加状态，也可以添加子状态机
- *               3、本框架只适用于两层架构  MainMachine + 子状态机
+ *      注意事项：1、一个 MachineManager 中的同一父状态机下的状态名字不能相同，不同状态机之间的状态名字可以相同
+ *               2、AddState 方法既可以添加状态，也可以添加状态机
+ *               3、本框架只适用于两层架构  MainMachine + 子状态机  todo 不是很确定
  *      修改框架的注意点： State 类中 OnStateUpdate 和 OnStateLateUpdate ，_durationTime 只能出现一个
- *                                     
- *  
  */
 using System.Collections.Generic;
 namespace FSM

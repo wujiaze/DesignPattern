@@ -70,31 +70,20 @@ namespace FSM
         ///     同一个状态机下的状态之间的状态过渡
         /// </summary>
         /// <param name="manager"></param>
-        /// <param name="toName"></param>
+        /// <param name="toStateName"></param>
         /// <param name="transitionName"></param>
         /// <returns></returns>
-        protected Transition SetTransition(StateManager manager, StateName toName, TransitionName transitionName)
+        protected Transition AddTransition(StateManager manager, StateName toStateName, TransitionName transitionName)
         {
             StateMachine machine = manager.GetMachineWithName(Machine.Name);
-            State toState = machine.GetStateWithName(toName);
+            State toState = machine.GetStateWithName(toStateName);
             if (toState == null)
-                throw new Exception(toName + "为null");
-            Transition temp = new Transition(transitionName, toState);
-            return temp;
-        }
-
-
-        /// <summary>
-        /// 添加状态过渡
-        ///     辅助：InitTransitions 方法
-        /// </summary>
-        /// <param name="transition">状态过渡</param>
-        protected void AddTransition(Transition transition)
-        {
-            if (Transitions != null && !Transitions.ContainsKey(transition.Name))
-            {
-                Transitions.Add(transition.Name, transition);
-            }
+                throw new Exception(toStateName + "为null");
+            if (Transitions.ContainsKey(transitionName))
+                throw new Exception("此过渡状态已添加");
+            Transition transition = new Transition(transitionName, toState);
+            Transitions.Add(transitionName, transition);
+            return transition;
         }
 
         /// <summary>

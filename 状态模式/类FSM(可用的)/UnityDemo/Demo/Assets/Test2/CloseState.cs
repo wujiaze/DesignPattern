@@ -12,10 +12,9 @@ public class CloseState : State
 
     public override void InitTransitions(StateManager manager)
     {
-        close2Open = SetTransition(manager,StateName.OpenMachine,TransitionName.Close2Open);
+        close2Open = AddTransition(manager,StateName.OpenMachine,TransitionName.Close2Open);
         close2Open.onCheck += OnCheck;
         close2Open.onTransition += OnTransition;
-        AddTransition(close2Open);
     }
 
    

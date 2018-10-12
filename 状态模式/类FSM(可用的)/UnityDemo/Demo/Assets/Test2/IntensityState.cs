@@ -9,9 +9,8 @@ public class IntensityState : State
     private Transition intensity2Color;
     public override void InitTransitions(StateManager manager)
     {
-        intensity2Color = SetTransition(manager, StateName.Color, TransitionName.Intensity2Color);
+        intensity2Color = AddTransition(manager, StateName.Color, TransitionName.Intensity2Color);
         intensity2Color.onCheck += OnCheck;
-        AddTransition(intensity2Color);
         onEnter += OnEnter;
         onStayUpdate += OnStayUpdate;
     }
