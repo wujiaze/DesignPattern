@@ -36,6 +36,11 @@ namespace FSM
         /// </summary>
         public float DurationTime { get; private set; }
 
+        /// <summary>
+        /// 从其他状态切换为本状态时，是否连续执行 本状态的 OnStart 和 OnUpdate 方法，默认是连续执行，特殊需求可以自定义
+        /// </summary>
+        public bool IsRunContineStartAndUpdate { get; set; }
+
         #endregion
 
         // 构造函数
@@ -57,6 +62,7 @@ namespace FSM
             Machine = machine;
             Transitions = new Dictionary<TransitionName, Transition>();
             DurationTime = 0;
+            IsRunContineStartAndUpdate = true;
             RemoveStateEvent();
         }
 
@@ -79,7 +85,7 @@ namespace FSM
             State toState = machine.GetStateWithName(toStateName);
             if (toState == null)
                 throw new Exception(toStateName + "为null");
-            if(Transitions.ContainsKey(transitionName))
+            if (Transitions.ContainsKey(transitionName))
                 throw new Exception("此过渡状态已添加");
             Transition transition = new Transition(transitionName, toState);
             Transitions.Add(transitionName, transition);

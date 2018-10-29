@@ -194,6 +194,8 @@ namespace FSM
                     CurrentState = CurrentTransition.ToState;
                     CurrentState.OnStateEnter();
                     IsTransition = false;
+                    if (CurrentState.IsRunContineStartAndUpdate)
+                        result = false;
                 }
                 return result;
             }
@@ -204,11 +206,17 @@ namespace FSM
                     result = true;
                     IsTransition = true;
                     CurrentTransition = transition;
+                    // 判断是否需要进行状态过渡方法, 如果是持续性方法则当前帧执行转换，就不再执行 OnStateUpdate 的方法
+                    // 如果是 瞬时性方法 就可以直接执行，旧状态的 OnStateExit 和 新状态的 OnStateEnter 方法
+                    // 若是本帧只需要 执行 OnStateEnter 方法，而不想执行 Update 方法，将 IsRunContineStartAndUpdate 设为 false
+                    // 若本帧 新状态 需要连续执行 OnStateEnter 和 OnUpdate  方法，就是用默认的 true
                     if (CurrentTransition.TransitionCallBack())
                     {
                         CurrentState.OnStateExit();
                         CurrentState = CurrentTransition.ToState;
                         CurrentState.OnStateEnter();
+                        if (CurrentState.IsRunContineStartAndUpdate)
+                            result = false;
                         IsTransition = false;
                     }
                     return result; // 当前帧执行转换，就不再执行 OnStateUpdate 的方法
