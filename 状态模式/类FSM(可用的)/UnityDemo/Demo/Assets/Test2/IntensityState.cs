@@ -7,9 +7,9 @@ using FSM;
 public class IntensityState : State
 {
     private Transition intensity2Color;
-    public override void InitTransitions(StateManager manager)
+    public override void InitTransitions()
     {
-        intensity2Color = AddTransition(manager, StateName.Color, TransitionName.Intensity2Color);
+        intensity2Color = AddTransition(StateName.Color, TransitionName.Intensity2Color);
         intensity2Color.onCheck += OnCheck;
         onEnter += OnEnter;
         onStayUpdate += OnStayUpdate;

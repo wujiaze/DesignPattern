@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class MainStateMachine : StateMachine
 {
-    public MainStateMachine(StateName name, StateMachine machine) : base(name, machine)
+    public MainStateMachine(StateName name, StateMachine machine = null) : base(name, machine)
     {
 
     }
@@ -15,10 +15,10 @@ public class MainStateMachine : StateMachine
 
     }
 
-    public override void InitTransitions(StateManager manager)
+    public override void InitTransitions()
     {
-       
+
     }
 
-    
+
 }

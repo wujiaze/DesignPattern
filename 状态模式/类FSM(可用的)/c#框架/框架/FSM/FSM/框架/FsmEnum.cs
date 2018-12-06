@@ -13,6 +13,13 @@
         Color
     }
     /// <summary>
+    /// 状态Tag 或 状态机Tag
+    /// </summary>
+    public enum StateTag
+    {
+        Null
+    }
+    /// <summary>
     /// 状态过渡名字
     /// </summary>
     public enum TransitionName
@@ -23,13 +30,4 @@
         Intensity2Color,
         Open2Close
     }
-    /// <summary>
-    /// 状态Tag 或 状态机Tag
-    /// </summary>
-    public enum StateTag
-    {
-        Null
-    }
-
-   
 }

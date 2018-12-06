@@ -10,9 +10,9 @@ public class OpenMachine : StateMachine
     private Light _light;
     private Transition open2close;
 
-    public override void InitTransitions(StateManager manager)
+    public override void InitTransitions()
     {
-        open2close = AddTransition(manager, StateName.Close, TransitionName.Open2Close);
+        open2close = AddTransition(StateName.Close, TransitionName.Open2Close);
         open2close.onCheck += OnCheck;
         open2close.onTransition += OnTransition;
         onExit += OnExit;

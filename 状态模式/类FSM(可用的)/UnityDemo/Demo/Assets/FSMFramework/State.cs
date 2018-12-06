@@ -12,6 +12,17 @@ namespace FSM
         public Action<float> onStayUpdate { get; set; }
         public Action<float> onStayLateUpdate { get; set; }
         public Action onStayFixedUpdate { get; set; }
+        /// <summary>
+        /// 移除所有事件（根据具体的项目添加具体的移除方法）
+        /// </summary>
+        public virtual void RemoveStateEvent()
+        {
+            onEnter = null;
+            onExit = null;
+            onStayUpdate = null;
+            onStayLateUpdate = null;
+            onStayFixedUpdate = null;
+        }
 
         #endregion
         #region 属性
@@ -40,7 +51,10 @@ namespace FSM
         /// 从其他状态切换为本状态时，是否连续执行 本状态的 OnStart 和 OnUpdate 方法，默认是连续执行，特殊需求可以自定义
         /// </summary>
         public bool IsRunContineStartAndUpdate { get; set; }
-
+        /// <summary>
+        /// 管理本状态的状态管理类
+        /// </summary>
+        public StateManager StateManager { get; set; }
         #endregion
 
         // 构造函数
@@ -49,6 +63,7 @@ namespace FSM
         /// </summary>
         protected State()
         {
+
         }
 
         /// <summary>
@@ -69,27 +84,34 @@ namespace FSM
         /// <summary>
         /// 初始化所有的状态过渡
         /// </summary>
-        public abstract void InitTransitions(StateManager manager);
+        public abstract void InitTransitions();
 
         /// <summary>
         /// 设置单一的状态过渡
         ///     同一个状态机下的状态之间的状态过渡
         /// </summary>
-        /// <param name="manager"></param>
         /// <param name="toStateName"></param>
         /// <param name="transitionName"></param>
         /// <returns></returns>
-        protected Transition AddTransition(StateManager manager, StateName toStateName, TransitionName transitionName)
+        protected Transition AddTransition(StateName toStateName, TransitionName transitionName)
         {
-            StateMachine machine = manager.GetMachineWithName(Machine.Name);
+            StateMachine machine = StateManager.GetMachineWithName(Machine.Name);
             State toState = machine.GetStateWithName(toStateName);
             if (toState == null)
-                throw new Exception(toStateName + "为null");
+                throw new Exception("从本状态切换到 "+toStateName + "状态，不存在");
             if (Transitions.ContainsKey(transitionName))
-                throw new Exception("此过渡状态已添加");
+                throw new Exception("此过渡状态已存在");
             Transition transition = new Transition(transitionName, toState);
             Transitions.Add(transitionName, transition);
             return transition;
+        }
+
+        /// <summary>
+        /// 重新初始化，清空 State 的运行后产生的内容
+        /// </summary>
+        public virtual void ReInit()
+        {
+            DurationTime = 0;
         }
 
         /// <summary>
@@ -100,7 +122,7 @@ namespace FSM
 
 
 
-        /* 以下几个方法，在新的State子类中需要重写 */
+        /* 以下几个方法，在新的 StateMachine 子类中需要重写 */
 
         public virtual void OnStateEnter()
         {
@@ -133,17 +155,7 @@ namespace FSM
             if (onStayFixedUpdate != null)
                 onStayFixedUpdate();
         }
-        /// <summary>
-        /// 移除所有事件（根据具体的项目添加具体的移除方法）
-        /// </summary>
-        public virtual void RemoveStateEvent()
-        {
-            onEnter = null;
-            onExit = null;
-            onStayUpdate = null;
-            onStayLateUpdate = null;
-            onStayFixedUpdate = null;
-        }
+      
 
     }
 }

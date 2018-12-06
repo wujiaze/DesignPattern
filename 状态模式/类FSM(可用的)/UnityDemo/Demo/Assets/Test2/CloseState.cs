@@ -10,9 +10,9 @@ public class CloseState : State
     private Light _light;
     private Transition close2Open;
 
-    public override void InitTransitions(StateManager manager)
+    public override void InitTransitions()
     {
-        close2Open = AddTransition(manager,StateName.OpenMachine,TransitionName.Close2Open);
+        close2Open = AddTransition(StateName.OpenMachine,TransitionName.Close2Open);
         close2Open.onCheck += OnCheck;
         close2Open.onTransition += OnTransition;
     }

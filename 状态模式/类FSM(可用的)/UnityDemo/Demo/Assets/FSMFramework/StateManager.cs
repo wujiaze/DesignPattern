@@ -26,6 +26,16 @@ namespace FSM
         {
             States = new List<State>();
         }
+        public StateManager(params State[] states)
+        {
+            States = new List<State>();
+            AddState(states);
+        }
+        public StateManager(List<State> states)
+        {
+            States = states;
+            SetTrasitions();
+        }
         /// <summary>
         /// 添加状态
         /// </summary>
@@ -35,32 +45,51 @@ namespace FSM
             foreach (State state in states)
             {
                 if (!States.Contains(state))
+                {
                     States.Add(state);
+                    state.StateManager = this;
+                }   
             }
+            SetTrasitions();
         }
+
+
         /// <summary>
         /// 移除状态
         /// </summary>
-        /// <param name="machines"></param>
-        public void RemoveMachine(params State[] states)
+        /// <param name="states"></param>
+        public void RemoveState(params State[] states)
         {
             foreach (State state in states)
             {
                 if (States.Contains(state))
+                {
                     States.Remove(state);
+                    state.Machine.RemoveState(state.Name);
+                } 
             }
         }
 
+        /// <summary>
+        /// 重新初始化，清空 状态机框架 的运行后产生的框架内容
+        /// </summary>
+        public void ReInit()
+        {
+            foreach (State state in States)
+            {
+                state.ReInit();
+            }
+        }
 
         /// <summary>
         /// 初始化该状态机中所有状态的所有状态过渡
         /// 一定要在所有状态设置完毕之后，再使用本方法
         /// </summary>
-        public void SetTrasitions()
+        private void SetTrasitions()
         {
             foreach (State state in States)
             {
-                state.InitTransitions(this);
+                state.InitTransitions();
             }
         }
         /// <summary>
@@ -93,10 +122,62 @@ namespace FSM
             }
             return result;
         }
+        /// <summary>
+        /// 根据Tag获取状态机
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public StateMachine GetMachineWithTag(StateTag tag)
+        {
+            StateMachine result = null;
+            foreach (State machine in States)
+            {
+                if (machine.Tag == tag)
+                {
+                    result = (StateMachine)machine;
+                    break;
+                }
+            }
+            return result;
+        }
 
+        /// <summary>
+        /// 根据名字获取状态
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>null：没有该状态</returns>
+        public State GetStateWithName(StateName name)
+        {
+            State result = null;
+            foreach (State state in States)
+            {
+                if (state.Name == name)
+                {
+                    result = state;
+                    break;
+                }
+            }
+            return result;
+        }
 
-
-
+        /// <summary>
+        /// 根据Tag获取状态
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns>null：没有该状态</returns>
+        public State GetStateWithTag(StateTag tag)
+        {
+            State result = null;
+            foreach (State state in States)
+            {
+                if (state.Tag == tag)
+                {
+                    result = state;
+                    break;
+                }
+            }
+            return result;
+        }
         #endregion
 
     }

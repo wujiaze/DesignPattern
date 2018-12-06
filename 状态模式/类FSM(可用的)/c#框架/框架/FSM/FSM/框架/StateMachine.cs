@@ -40,10 +40,12 @@ namespace FSM
         }
         /// <summary>
         /// 构造函数
+        ///    使用构造函数创建 StateMachine 一般是最顶层,就不需要再有父状态机
+        ///    但是，如不是最顶层，需要添加父状态机
         /// </summary>
         /// <param name="name">状态机的名字</param>
         /// <param name="machine">状态机所属的父状态机</param>
-        protected StateMachine(StateName name, StateMachine machine)
+        protected StateMachine(StateName name, StateMachine machine = null)
         {
             this.InitState(name, machine);
         }
@@ -66,21 +68,24 @@ namespace FSM
         /// </summary>
         /// <typeparam name="T">类型</typeparam>
         /// <param name="name">添加的状态名</param>
+        /// <param name="isDefault">是否设置为默认状态</param>
         /// <returns>添加的状态</returns>
-        public T AddState<T>(StateName name) where T : State, new()
+        public T AddState<T>(StateName name, bool isDefault = false) where T : State, new()
         {
             if (DictStates == null)
-                return null;
+                throw new Exception("DictStates 为 null");
             if (DictStates.ContainsKey(name))
-                return null;
+                throw new Exception("DictStates 中已存在  " + name);
             T state = new T();
             state.InitState(name, this);
             DictStates.Add(name, state);
+            if (isDefault)
+                DefaultState = state;
             return state;
         }
 
         /// <summary>
-        /// 移除状态
+        /// 移除状态/状态机
         /// 不能是当前状态和默认状态
         /// </summary>
         /// <param name="name"></param>
@@ -88,19 +93,37 @@ namespace FSM
         public bool RemoveState(StateName name)
         {
             bool result = false;
-            if (CurrentState.Name != name && DefaultState.Name != name)
+            if (CurrentState != null && CurrentState.Name != name && DefaultState != null && DefaultState.Name != name)
             {
                 if (DictStates != null && DictStates.ContainsKey(name))
                 {
+                    // 删除状态
                     DictStates.Remove(name);
+                    // 删除过渡到本状态的状态过渡
+                    foreach (State state in DictStates.Values)
+                    {
+                        List<TransitionName> templist = new List<TransitionName>();
+                        foreach (Transition transition in state.Transitions.Values)
+                        {
+                            if (transition.ToState.Name == name)
+                            {
+                                templist.Add(transition.Name);
+                            }
+                        }
+                        foreach (TransitionName transitionName in templist)
+                        {
+                            state.Transitions.Remove(transitionName);
+                        }
+                    }
                     result = true;
                 }
             }
             return result;
         }
 
+
         /// <summary>
-        /// 获取状态
+        /// 根据名字获取状态
         /// </summary>
         /// <param name="name"></param>
         /// <returns>null：没有该状态</returns>
@@ -110,8 +133,9 @@ namespace FSM
             DictStates.TryGetValue(name, out state);
             return state;
         }
+
         /// <summary>
-        /// 获取状态
+        /// 根据Tag获取状态
         /// </summary>
         /// <param name="tag"></param>
         /// <returns>null：没有该状态</returns>
@@ -127,6 +151,17 @@ namespace FSM
             return null;
         }
 
+        /// <summary>
+        ///  重新初始化，清空 StateMachine 的运行后产生的内容
+        /// </summary>
+        public override void ReInit()
+        {
+            base.ReInit();
+            CurrentState = null;
+            CurrentTransition = null;
+            IsTransition = false;
+        }
+
         /* 以下两个方法在 状态机的子类中可以修改*/
 
         public override void OnStateEnter()
@@ -138,7 +173,8 @@ namespace FSM
         {
             base.OnStateExit();
         }
-        /* 以下三个方法 一般不修改*/
+
+        /* 以下三个方法 一般不修改，作为状态机的启动函数*/
         public override void OnStateUpdate(float deltatime)
         {
             base.OnStateUpdate(deltatime);
@@ -208,8 +244,8 @@ namespace FSM
                     CurrentTransition = transition;
                     // 判断是否需要进行状态过渡方法, 如果是持续性方法则当前帧执行转换，就不再执行 OnStateUpdate 的方法
                     // 如果是 瞬时性方法 就可以直接执行，旧状态的 OnStateExit 和 新状态的 OnStateEnter 方法
-                    // 若是本帧只需要 执行 OnStateEnter 方法，而不想执行 Update 方法，将 IsRunContineStartAndUpdate 设为 false
-                    // 若本帧 新状态 需要连续执行 OnStateEnter 和 OnUpdate  方法，就是用默认的 true
+                    // 所以若是本帧只需要 执行 OnStateEnter 方法，而不想执行 OnStateUpdate 方法，将 IsRunContineStartAndUpdate 设为 false
+                    // 若本帧 新状态 需要在状态过渡结束之后直接连续执行 OnStateEnter 和 OnUpdate  方法，就是用默认的 true
                     if (CurrentTransition.TransitionCallBack())
                     {
                         CurrentState.OnStateExit();
