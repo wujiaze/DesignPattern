@@ -206,9 +206,9 @@ namespace FSM
         }
 
         /// <summary>
-        /// 判断 状态过度 是否进行
+        /// 判断 状态过渡 是否进行
         /// </summary>
-        /// <returns>true: 状态转换了 false：还是当前状态</returns>
+        /// <returns>true: 本帧不再执行当前状态的 OnStateUpdate 的方法 false：本帧执行当前状态的 OnStateUpdate 的方法 </returns>
         private bool DoTransition()
         {
             bool result = false;
@@ -235,27 +235,37 @@ namespace FSM
                 }
                 return result;
             }
+            // 当多个转换条件都满足，则只执行第一个转换
             foreach (Transition transition in CurrentState.Transitions.Values)
             {
+                // 如果过渡动作执行到中途，取消过渡动作，则直接停止过渡动作，执行当前状态的 OnStateUpdate/OnStateLateUpdate/OnStateFixedUpdate 方法
+                // 即可以中断/快速切换，不必等过渡动作完成
                 if (transition.Check())
                 {
                     result = true;
                     IsTransition = true;
                     CurrentTransition = transition;
-                    // 判断是否需要进行状态过渡方法, 如果是持续性方法则当前帧执行转换，就不再执行 OnStateUpdate 的方法
-                    // 如果是 瞬时性方法 就可以直接执行，旧状态的 OnStateExit 和 新状态的 OnStateEnter 方法
-                    // 所以若是本帧只需要 执行 OnStateEnter 方法，而不想执行 OnStateUpdate 方法，将 IsRunContineStartAndUpdate 设为 false
-                    // 若本帧 新状态 需要在状态过渡结束之后直接连续执行 OnStateEnter 和 OnUpdate  方法，就是用默认的 true
-                    if (CurrentTransition.TransitionCallBack())
+                    /*
+                     *  判断过渡动作是否执行完毕
+                     *  true ：过渡动作完成，    本帧继续执行 旧状态的 OnStateExit 和 新状态的 OnStateEnter 方法
+                     *  false：过渡动作正在进行， 本帧不执行 当前状态(旧状态)的 OnStateUpdate/OnStateLateUpdate/OnStateFixedUpdate 方法
+                     *                          只执行当前的过渡动作
+                     */
+                    if (CurrentTransition.TransitionCallBack())// true：过渡动作完成  false：正在进行过渡动作
                     {
                         CurrentState.OnStateExit();
                         CurrentState = CurrentTransition.ToState;
                         CurrentState.OnStateEnter();
+                        IsTransition = false;
+                        /*
+                         *  此时刚刚进入了新状态，IsRunContineStartAndUpdate 属性
+                        *      1、true  ：本帧 执行   新状态的 OnStateUpdate/OnStateLateUpdate/OnStateFixedUpdate 方法
+                        *      2、false ：本帧 不执行 新状态的 OnStateUpdate/OnStateLateUpdate/OnStateFixedUpdate 方法
+                        */
                         if (CurrentState.IsRunContineStartAndUpdate)
                             result = false;
-                        IsTransition = false;
                     }
-                    return result; // 当前帧执行转换，就不再执行 OnStateUpdate 的方法
+                    return result; // true 本帧不再执行当前状态的 OnStateUpdate 的方法，false 本帧执行当前状态的 OnStateUpdate 的方法
                 }
             }
             return result;

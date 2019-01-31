@@ -29,13 +29,12 @@ namespace FSM
 
         #region 委托
         /// <summary>
-        /// 检测条件
+        /// 检测条件，每帧调用
         /// </summary>
         public Func<bool> onCheck { get; set; }
 
         /// <summary>
-        /// 转换过程的回调
-        ///     可以是一种延时方法
+        /// 过渡动作，每帧调用
         /// </summary>
         public Func<bool> onTransition { get; set; }
 
@@ -44,7 +43,7 @@ namespace FSM
 
         #region 方法
         /// <summary>
-        /// 检查本状态过渡是否满足过渡条件
+        /// 判断是否需要执行 状态过渡动作
         /// </summary>
         /// <returns>false：不满足条件  true：满足条件</returns>
         public bool Check()

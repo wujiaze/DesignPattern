@@ -82,7 +82,7 @@ namespace FSM
         }
 
         /// <summary>
-        /// 初始化所有的状态过渡
+        /// 初始化所有的状态过渡,具体的内容具体类进行修改
         /// </summary>
         public abstract void InitTransitions();
 
