@@ -218,6 +218,38 @@ namespace FSM
                     throw new Exception("默认状态不能为空");
                 CurrentState = DefaultState;
             }
+
+            #region 另一种处理方式
+            //// todo 1、多个状态同时触发，不好处理
+            //// todo 2、CurrentTransition.TransitionCallBack() 需要回复到初始状态
+            //// todo 3、最好不要在进行状态过渡时，中止当前过渡
+            //// todo 4、所以本状态模式最后采用，当前过渡没有完成时，没有中止当前状态过渡，以及无法进入其他的状态过渡
+            //// 判断是否正在进行状态过渡
+            //if (IsTransition)
+            //{
+            //    if (!CurrentTransition.Check()) // 只有当前过渡中止，才能切换，其他的状态过渡，在当前过渡执行中是不会触发的
+            //    {
+            //        result = false;
+            //        IsTransition = false;
+            //    }
+            //    else
+            //    {
+            //        result = true;
+            //        // 判断状态过渡的回调是否执行完毕
+            //        if (CurrentTransition.TransitionCallBack())
+            //        {
+            //            // 执行状态过渡（就是状态的退出 和 进入方法）
+            //            CurrentState.OnStateExit();
+            //            CurrentState = CurrentTransition.ToState;
+            //            CurrentState.OnStateEnter();
+            //            IsTransition = false;
+            //            if (CurrentState.IsRunContineStartAndUpdate)
+            //                result = false;
+            //        }
+            //        return result;
+            //    }
+            //}
+            #endregion
             // 判断是否正在进行状态过渡
             if (IsTransition)
             {
@@ -238,15 +270,13 @@ namespace FSM
             // 当多个转换条件都满足，则只执行第一个转换
             foreach (Transition transition in CurrentState.Transitions.Values)
             {
-                // 如果过渡动作执行到中途，取消过渡动作，则直接停止过渡动作，执行当前状态的 OnStateUpdate/OnStateLateUpdate/OnStateFixedUpdate 方法
-                // 即可以中断/快速切换，不必等过渡动作完成
                 if (transition.Check())
                 {
                     result = true;
                     IsTransition = true;
                     CurrentTransition = transition;
                     /*
-                     *  判断过渡动作是否执行完毕
+                     *  执行状态过渡
                      *  true ：过渡动作完成，    本帧继续执行 旧状态的 OnStateExit 和 新状态的 OnStateEnter 方法
                      *  false：过渡动作正在进行， 本帧不执行 当前状态(旧状态)的 OnStateUpdate/OnStateLateUpdate/OnStateFixedUpdate 方法
                      *                          只执行当前的过渡动作
